@@ -1,5 +1,8 @@
 import React from 'react'
 import { Route, Routes } from 'react-router-dom'
+
+import Navbar from './components/student/Navbar'
+
 import Home from './pages/student/Home'
 import Player from './pages/student/Player'
 import CoursesList from "./pages/student/CoursesList";
@@ -15,7 +18,8 @@ import StudentEnrolled from './pages/educator/StudentsEnrolled'
 
 const App = () => {
   return (
-    <div>
+    <div className='text-default min-h-screen bg-white'>
+      <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/course-list" element={<CoursesList />} />
