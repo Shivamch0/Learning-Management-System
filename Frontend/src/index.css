@@ -2,7 +2,8 @@
 @import "tailwindcss";
 
 @theme {
-   --text-course-details-heading-small: 26px;
+
+  --text-course-details-heading-small: 26px;
   --text-course-details-heading-small--line-height: 36px;
 
   --text-course-details-heading-large: 36px;
@@ -16,9 +17,23 @@
 
   --text-default: 15px;
   --text-default--line-height: 21px;
+
+
+  --grid-cols-auto: repeat(auto-fit, minmax(200px, 1fr));
+
+
+  --font-outfit: "Outfit", sans-serif;
+  --font-montserrat: "Montserrat", sans-serif;
 }
 
-*{
-    font-family: Outfit;
+* {
+  font-family: "Outfit", sans-serif;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  min-height: 100vh;
+}
