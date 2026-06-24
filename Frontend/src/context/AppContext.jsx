@@ -10,6 +10,7 @@ export const AppProvider = ({children}) => {
     const navigate = useNavigate()
 
     const [allCourses , setAllCourses] = useState([]);
+    const [isEducator , setIsEducator] = useState(true);
 
     const fetchAllCourses = async () => {
         setAllCourses(dummyCourses);
@@ -31,7 +32,7 @@ export const AppProvider = ({children}) => {
     } , [])
 
     const value = {
-        currency , allCourses , navigate , calculateRating
+        currency , allCourses , navigate , calculateRating , isEducator , setIsEducator
     }
 
     return <AppContext.Provider value={value}>{children}</AppContext.Provider>
