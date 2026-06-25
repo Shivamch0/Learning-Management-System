@@ -1,10 +1,6 @@
 import {Webhook} from 'svix';
 import { User } from '../model/user.model.js';
 
-import { asyncHandler } from '../utils/asyncHandler.js';
-import { ApiError } from '../utils/ApiError.js';
-import { ApiResponse } from '../utils/ApiRespnse.js';
-
 export const clerkWebHooks = async(req , res) => {
     try {
         const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET)
