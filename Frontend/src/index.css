@@ -21,6 +21,7 @@
 
   --grid-cols-auto: repeat(auto-fit, minmax(200px, 1fr));
 
+  --spacing-section-height: 500px;
 
   --font-outfit: "Outfit", sans-serif;
   --font-montserrat: "Montserrat", sans-serif;
