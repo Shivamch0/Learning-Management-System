@@ -1,5 +1,6 @@
 import express from 'express';
 import { clerkWebHooks } from './controller/webhooks.js';
+import cors from 'cors'
 
 const app = express();
 
