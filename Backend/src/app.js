@@ -5,7 +5,7 @@ const app = express();
 
 app.use(cors());
 
-app.get('/' , "Api Working")
+app.get('/' , (req , res) => res.send("API Working"))
 app.post('/clerk' , express.json() , clerkWebHooks)
 
 
