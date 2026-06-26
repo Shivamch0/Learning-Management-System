@@ -10,6 +10,8 @@ await connectCloudinary()
 app.use(cors());
 app.use(clerkMiddleware())
 
+app.post('/stripe' , express.raw({type : 'application/json'}) , stripeWebhooks)
+
 app.use(express.json())
 
 import educatorRouter from './routes/educator.route.js';
@@ -23,7 +25,7 @@ app.use('/api/educator' ,  educatorRouter);
 app.use('/api/course' , courseRouter);
 app.use('/api/user' , userRouter)
 
-app.post('/stripe' , express.raw({type : 'application/json'}) , stripeWebhooks)
+
 
 
 
