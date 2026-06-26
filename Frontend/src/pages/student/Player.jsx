@@ -8,6 +8,7 @@ import Footer from "../../components/student/Footer";
 import Rating from "../../components/student/Rating";
 import axios from "axios";
 import { toast } from "react-toastify";
+import Loading from "../../components/student/Loading";
 
 const Player = () => {
   const {
@@ -29,7 +30,7 @@ const Player = () => {
     enrolledCourses.map((course) => {
       if (course._id === courseId) {
         setCourseData(course);
-        course.courseRating.map((item) => {
+        course.courseRatings.map((item) => {
           if (item.userId === userData._id) {
             setInitialRating(item.rating);
           }
@@ -62,7 +63,7 @@ const Player = () => {
 
       if (data.success) {
         toast.success(data.message);
-        getCourseProgress()
+        getCourseProgress();
       } else {
         toast.error(data.message);
       }
@@ -83,40 +84,42 @@ const Player = () => {
         },
       );
       if (data.success) {
-        setProgressData(data.progressData)
+        setProgressData(data.progressData);
       } else {
         toast.error(data.message);
       }
     } catch (error) {
       toast.error(error.message);
     }
- }
+  };
 
- const handleRate = async () => {
-  try {
-    
-    const token = await getToken();
+  const handleRate = async () => {
+    try {
+      const token = await getToken();
 
-    const { data } = await axios.post(
-      backendUrl + "/api/user/add-rating",
-      { courseId },
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      },
-    );
-    if (data.success) {
-      toast.success(data.message);
-      fetchUserEnrolledCourses();
-    } else {
-      toast.error(data.message);
+      const { data } = await axios.post(
+        backendUrl + "/api/user/add-rating",
+        { courseId },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      if (data.success) {
+        toast.success(data.message);
+        fetchUserEnrolledCourses();
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
     }
+  };
 
-  } catch (error) {
-    toast.error(error.message);
-  }
- }
+  useEffect(() => {
+    getCourseProgress();
+  }, []);
 
-  return (
+  return courseData ? (
     <>
       <div className="p-4 ms:p-10 flex flex-col-reverse md:grid md:grid-cols-2 gap-10 md:px-36">
         <div className="text-gray-800">
@@ -156,7 +159,10 @@ const Player = () => {
                         <li key={i} className="flex items-start gap-2 py-1">
                           <img
                             src={
-                              false ? assets.blue_tick_icon : assets.play_icon
+                              progressData &&
+                              progressData.lectureCompleted.includes(lectureId)
+                                ? assets.blue_tick_icon
+                                : assets.play_icon
                             }
                             alt="play_icon"
                             className="w-4 h-4 mt-1"
@@ -197,7 +203,7 @@ const Player = () => {
 
           <div className="flex items-center gap-2 py-3 mt-10">
             <h1 className="text-xl font-bold">Rate this Course:</h1>
-            <Rating initialRating={0} />
+            <Rating initialRating={initialRating} onRate={handleRate} />
           </div>
         </div>
 
@@ -213,26 +219,33 @@ const Player = () => {
                   {playerData.chapter}.{playerData.lecture}{" "}
                   {playerData.lectureTitle}
                 </p>
-                <button className="text-blue-600">
-                  {false ? "Completed" : "Mark Complete"}
+                <button
+                  onClick={() => markLectureCompleted(playerData.lectureId)}
+                  className="text-blue-600"
+                >
+                  {progressData &&
+                  progressData.lectureCompleted.includes(lectureId)
+                    ? "Completed"
+                    : "Mark Complete"}
                 </button>
               </div>
             </div>
           ) : (
-            ""
-            // <img
-            //   src={
-            //     courseData
-            //       ? courseData.courseThumbnail
-            //       : courseData.courseThumbnail
-            //   }
-            //   alt=""
-            // />
+            <img
+              src={
+                courseData
+                  ? courseData.courseThumbnail
+                  : courseData.courseThumbnail
+              }
+              alt=""
+            />
           )}
         </div>
       </div>
       <Footer />
     </>
+  ) : (
+    <Loading />
   );
 };
 
