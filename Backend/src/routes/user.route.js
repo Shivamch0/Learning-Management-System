@@ -1,10 +1,15 @@
 import express from 'express';
-import { getUserData, purchaseCourse, userEnrolledCourses } from '../controller/user.controller.js';
+import { addUserRating, getUserCourseProgress, getUserData, purchaseCourse, updateUserCourseProfress, userEnrolledCourses } from '../controller/user.controller.js';
 
 const router = express.Router();
 
 router.get('/data' , getUserData);
 router.get('/enrolled-courses' , userEnrolledCourses);
-router.post('/purchase' , purchaseCourse)
+router.post('/purchase' , purchaseCourse);
+
+router.post('update-course-progress' , updateUserCourseProfress);
+router.post('/get-course-progress' , getUserCourseProgress);
+router.post('/add-rating' , addUserRating);
+
 
 export default router;
