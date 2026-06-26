@@ -5,9 +5,6 @@ import { Purchase } from "../model/purchase.model.js";
 import { User } from "../model/user.model.js";
 
 export const updateRoleEducator = async (req, res) => {
-  console.log(req.auth.userId);
-  console.log(req.auth);
-  console.log(req.headers.authorization);
   try {
     const { userId } = getAuth(req);
 
