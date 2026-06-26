@@ -2,6 +2,7 @@ import { clerkClient, getAuth } from "@clerk/express";
 import { Course } from "../model/course.model.js";
 import { v2 as cloudinary } from "cloudinary";
 import { Purchase } from "../model/purchase.model.js";
+import { User } from "../model/user.model.js";
 
 export const updateRoleEducator = async (req, res) => {
   console.log(req.auth.userId);
@@ -19,9 +20,9 @@ export const updateRoleEducator = async (req, res) => {
         role: "educator",
       },
     });
-    res.json({ success: true, message: "You can publish a course now" });
+    return res.json({ success: true, message: "You can publish a course now" });
   } catch (error) {
-    res.json({ success: false, message: error.message });
+    return res.json({ success: false, message: error.message });
   }
 };
 
@@ -44,9 +45,9 @@ export const addCourse = async (req , res) => {
         newCourse.courseThumbnail = imageUpload.secure_url;
         await newCourse.save();
 
-        res.json({success : true , message : "Course Added"})
+        return res.json({success : true , message : "Course Added"})
     } catch (error) {
-        res.json({success : false , message : error.message})
+        return res.json({success : false , message : error.message})
     }
 }
 
@@ -55,9 +56,9 @@ export const getEducatorCourses = async (req , res) => {
     try {
         const {userId} = getAuth(req);
         const courses = await Course.find({educator : userId});
-        res.json({success : true , courses})
+        return res.json({success : true , courses})
     } catch (error) {
-        res.json({success : false , message : error.message})
+        return res.json({success : false , message : error.message})
     }
 }
 
@@ -76,7 +77,7 @@ export const educatorDashboardData = async (req , res) => {
             status : 'completed'
         }) 
 
-        const totalEarnings = purchases.reduce((sum , purchase) => sum + purchase)
+        const totalEarnings = purchases.reduce((sum , purchase) => sum + purchase.amount, 0)
 
         const enrolledStudentsData = []
         for(const course of courses){
@@ -91,12 +92,12 @@ export const educatorDashboardData = async (req , res) => {
                 });
             });
         }
-        res.json({success : true , dashboardData : {
+        return res.json({success : true , dashboardData : {
             totalEarnings , enrolledStudentsData , totalCourses
         }})
 
     } catch (error) {
-        res.json({success : false , message : error.message})
+        return res.json({success : false , message : error.message})
     }
 }
 
@@ -112,15 +113,15 @@ export const getEnrolledStudentsData = async (req , res) => {
             status : 'completed'
         }).populate('userId' , 'name imageUrl').populate('courseId' , 'courseTitle')
 
-        const enrolledStudents = purchases.map(purchase = ({
+        const enrolledStudents = purchases.map((purchase) => ({
             student : purchase.userId,
             courseTitle : purchase.courseId.courseTitle,
             purchaseData : purchase.createdAt
         }))
 
-        res.json({success : true , enrolledStudents})
+        return res.json({success : true , enrolledStudents})
 
     } catch (error) {
-        res.json({success : false , message : error.message})
+        return res.json({success : false , message : error.message})
     }
 }
