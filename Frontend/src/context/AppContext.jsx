@@ -36,9 +36,8 @@ export const AppProvider = ({ children }) => {
   };
 
   const fetchUserData = async () => {
-
-    if(user.publicMetadata.role === 'educator'){
-      setIsEducator(true)
+    if (user.publicMetadata.role === "educator") {
+      setIsEducator(true);
     }
 
     try {
@@ -66,7 +65,7 @@ export const AppProvider = ({ children }) => {
       totalRating += rating.rating;
     });
 
-    return totalRating / course.courseRatings.length;
+    return Math.floor(totalRating / course.courseRatings.length)
   };
 
   const calculateChapterTime = (chapter) => {
@@ -97,17 +96,32 @@ export const AppProvider = ({ children }) => {
   };
 
   const fetchUserEnrolledCourses = async () => {
-    setEnrolledCourses(dummyCourses);
+    try {
+      const token = await getToken();
+      const { data } = await axios.get(
+        backendUrl + "/api/user/enrolled-courses",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      if (data.success) {
+        setEnrolledCourses(data.enrolledCourses.reverse());
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   useEffect(() => {
     fetchAllCourses();
-    fetchUserEnrolledCourses();
   }, []);
 
   useEffect(() => {
     if (user) {
       fetchUserData();
+      fetchUserEnrolledCourses();
     }
   }, [user]);
 
@@ -124,10 +138,10 @@ export const AppProvider = ({ children }) => {
     enrolledCourses,
     fetchUserEnrolledCourses,
     backendUrl,
-    userData , 
+    userData,
     setUserData,
     getToken,
-    fetchAllCourses
+    fetchAllCourses,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
