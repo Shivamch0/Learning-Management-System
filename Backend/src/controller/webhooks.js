@@ -1,8 +1,11 @@
+import dotenv from 'dotenv';
+dotenv.config();
 import { Webhook } from "svix";
 import { User } from "../model/user.model.js";
 import Stripe from "stripe";
 import { Purchase } from "../model/purchase.model.js";
 import { Course } from "../model/course.model.js";
+
 
 export const clerkWebHooks = async (req, res) => {
   try {
