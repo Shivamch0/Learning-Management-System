@@ -49,7 +49,7 @@ const Player = () => {
     }
   }, [enrolledCourses]);
 
-  const markLectureCompleted = async (lectureId) => {
+  const markLectureAslCompleted = async (lectureId) => {
     try {
       const token = await getToken();
 
@@ -93,13 +93,13 @@ const Player = () => {
     }
   };
 
-  const handleRate = async () => {
+  const handleRate = async (rating) => {
     try {
       const token = await getToken();
 
       const { data } = await axios.post(
         backendUrl + "/api/user/add-rating",
-        { courseId },
+        { courseId , rating },
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -159,8 +159,7 @@ const Player = () => {
                         <li key={i} className="flex items-start gap-2 py-1">
                           <img
                             src={
-                              progressData &&
-                              progressData.lectureCompleted.includes(lectureId)
+                              progressData && progressData.lectureCompleted.includes(lecture.lectureId)
                                 ? assets.blue_tick_icon
                                 : assets.play_icon
                             }
@@ -220,11 +219,11 @@ const Player = () => {
                   {playerData.lectureTitle}
                 </p>
                 <button
-                  onClick={() => markLectureCompleted(playerData.lectureId)}
+                  onClick={() => markLectureAsCompleted(playerData.lectureId)}
                   className="text-blue-600"
                 >
                   {progressData &&
-                  progressData.lectureCompleted.includes(lectureId)
+                  progressData.lectureCompleted.includes(playerData.lectureId)
                     ? "Completed"
                     : "Mark Complete"}
                 </button>
