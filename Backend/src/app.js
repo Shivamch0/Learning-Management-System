@@ -15,7 +15,7 @@ app.post('/clerk' , clerkWebHooks)
 import educatorRouter from './routes/educator.route.js'
 import { clerkMiddleware } from '@clerk/express';
 
-app.use('/api/educator' ,  )
+app.use('/api/educator' ,  educatorRouter)
 
 
 export default app;
