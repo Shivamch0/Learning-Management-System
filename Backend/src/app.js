@@ -4,8 +4,8 @@ import cors from 'cors'
 
 const app = express();
 
+await connectCloudinary()
 app.use(cors());
-app.use(clerkMiddleware())
 
 app.use(express.json())
 
@@ -14,6 +14,7 @@ app.post('/clerk' , clerkWebHooks)
 
 import educatorRouter from './routes/educator.route.js'
 import { clerkMiddleware } from '@clerk/express';
+import connectCloudinary from './config/cloudinary.js';
 
 app.use('/api/educator' ,  educatorRouter)
 
