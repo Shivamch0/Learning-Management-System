@@ -5,9 +5,17 @@ import cors from 'cors'
 const app = express();
 
 app.use(cors());
+app.use(clerkMiddleware())
+
+app.use(express.json())
 
 app.get('/' , (req , res) => res.send("API Working"))
-app.post('/clerk' , express.json() , clerkWebHooks)
+app.post('/clerk' , clerkWebHooks)
+
+import educatorRouter from './routes/educator.route.js'
+import { clerkMiddleware } from '@clerk/express';
+
+app.use('/api/educator' ,  )
 
 
 export default app;
