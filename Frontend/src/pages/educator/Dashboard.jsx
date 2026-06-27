@@ -21,8 +21,6 @@ const Dashboard = () => {
         },
       );
 
-      console.log(data.dashboardData);
-
       if (data.success) {
         setDashboardData(data.dashboardData);
       } else {
