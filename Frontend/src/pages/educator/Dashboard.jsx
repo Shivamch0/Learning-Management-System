@@ -2,19 +2,42 @@ import React, { useContext, useEffect, useState } from "react";
 import { AppContext } from "../../context/AppContext";
 import { assets, dummyDashboardData } from "../../assets/assets";
 import Loading from "../../components/student/Loading";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState();
 
-  const { currency } = useContext(AppContext);
+  const { currency, backendUrl, getToken, isEducator } = useContext(AppContext);
 
   const fetchDashboardData = async () => {
-    setDashboardData(dummyDashboardData);
+    try {
+      const token = await getToken();
+
+      const { data } = await axios.get(
+        backendUrl + "/api/educator/dashboard",
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      console.log(data.dashboardData);
+
+      if (data.success) {
+        setDashboardData(data.dashboardData);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
   };
 
   useEffect(() => {
-    fetchDashboardData();
-  }, []);
+    if (isEducator) {
+      fetchDashboardData();
+    }
+  }, [isEducator]);
 
   return dashboardData ? (
     <div className="min-h-screen flex flex-col items-start justify-between gap-8 md:p-8 md:pb-0 p-4 pt-8 pb-0">
@@ -36,7 +59,7 @@ const Dashboard = () => {
 
             <div>
               <p className="text-2xl font-medium text-gray-600">
-                {dashboardData.totalCourses.length}
+                {dashboardData.totalCourses}
               </p>
 
               <p className="text-base text-gray-500">Total Courses</p>
@@ -48,7 +71,7 @@ const Dashboard = () => {
             <div>
               <p className="text-2xl font-medium text-gray-600">
                 {currency}
-                {dashboardData.totalEarnings.length}
+                {dashboardData.totalEarnings}
               </p>
 
               <p className="text-base text-gray-500">Total Earnings</p>
