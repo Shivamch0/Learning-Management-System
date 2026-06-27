@@ -1,10 +1,15 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import uniquid from "uniquid";
 import Quill from "quill";
 import { assets } from "../../assets/assets";
 import { Link } from "react-router-dom";
+import { AppContext } from "../../context/AppContext";
+import { toast } from "react-toastify";
+import axios from "axios";
 
 function AddCourse() {
+  const { backendUrl, getToken } = useContext(AppContext);
+
   const quillRef = useRef(null);
   const editorRef = useRef(null);
 
@@ -22,40 +27,47 @@ function AddCourse() {
     isPreviewFree: false,
   });
 
-  const handleChapter = (action , chapterId) => {
-    if(action === 'add'){
-      const title = prompt('Enter Chapter Name:')
-      if(title){
+  const handleChapter = (action, chapterId) => {
+    if (action === "add") {
+      const title = prompt("Enter Chapter Name:");
+      if (title) {
         const newChapter = {
-          chapterId : uniquid(),
-          chapterTitle : title,
+          chapterId: uniquid(),
+          chapterTitle: title,
           chapterContent: [],
-          collapsed : false,
-          chapterOrder : chapters.length > 0 ? chapters.slice(-1)[0].chapterOrder + 1 : 1,
+          collapsed: false,
+          chapterOrder:
+            chapters.length > 0 ? chapters.slice(-1)[0].chapterOrder + 1 : 1,
         };
-        setChapters([...chapters , newChapter])
+        setChapters([...chapters, newChapter]);
       }
-    }else if(action === 'remove'){
-      setChapters(chapters.filter((chapter) => chapter.chapterId !== chapterId));
-    }else if(action === 'toggle'){
+    } else if (action === "remove") {
       setChapters(
-        chapters.map((chapter) => chapter.chapterId === chapterId ? {...chapter, collapsed : !chapter.collapsed} : chapter)
+        chapters.filter((chapter) => chapter.chapterId !== chapterId),
+      );
+    } else if (action === "toggle") {
+      setChapters(
+        chapters.map((chapter) =>
+          chapter.chapterId === chapterId
+            ? { ...chapter, collapsed: !chapter.collapsed }
+            : chapter,
+        ),
       );
     }
-  }
+  };
 
-  const handleLecture = (action , chapterId , lectureIndex) => {
-    if(action === 'add'){
+  const handleLecture = (action, chapterId, lectureIndex) => {
+    if (action === "add") {
       setCurrentChapterId(chapterId);
       setShowPopup(true);
-    }else if(action === 'remove'){
+    } else if (action === "remove") {
       setChapters(
         chapters.map((chapter) => {
-          if(chapter.chapterId === chapterId){
-            chapter.chapterContent.splice(lectureIndex , 1);
+          if (chapter.chapterId === chapterId) {
+            chapter.chapterContent.splice(lectureIndex, 1);
           }
           return chapters;
-        })
+        }),
       );
     }
   };
@@ -63,16 +75,19 @@ function AddCourse() {
   const addLecture = () => {
     setChapters(
       chapters.map((chapter) => {
-        if(chapter.chapterId === currentChapterId){
+        if (chapter.chapterId === currentChapterId) {
           const newLecture = {
             ...lectureDetails,
-            lectureOrder : chapter.chapterContent.length > 0 ? chapter.chapterContent.slice(-1)[0].lectureOrder + 1: 1,
-            lectureId : uniquid()
+            lectureOrder:
+              chapter.chapterContent.length > 0
+                ? chapter.chapterContent.slice(-1)[0].lectureOrder + 1
+                : 1,
+            lectureId: uniquid(),
           };
           chapter.chapterContent.push(newLecture);
         }
-        return chapter
-      })
+        return chapter;
+      }),
     );
     setShowPopup(false);
     setLectureDetails({
@@ -84,9 +99,48 @@ function AddCourse() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    try {
+      e.preventDefault();
+      if (!image) {
+        toast.error("Thumbnail Not Selected");
+      }
 
-  }
+      const courseData = {
+        courseTitle,
+        courseDescription: quillRef.current.root.innerHTML,
+        coursePrice: Number(coursePrice),
+        discount: Number(discount),
+        courseContent: chapters,
+      };
+
+      const formData = new FormData();
+      formData.append("courseData", JSON.stringify(courseData));
+      formData.append("image", image);
+
+      const token = await getToken();
+      const { data } = await axios.post(
+        backendUrl + "/api/educator/add-course",
+        formData,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        setCourseTitle('');
+        setCoursePrice(0);
+        setDiscount(0);
+        setImage(null);
+        setChapters([]);
+        quillRef.current.root.innerHTML = ""
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
 
   useEffect(() => {
     if (!quillRef.current && editorRef.current) {
@@ -98,7 +152,10 @@ function AddCourse() {
 
   return (
     <div className="h-screen overflow-scroll flex flex-col items-start justify-between md:p-8 md:pb-0 p-4 pt-8 pb-0">
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-md w-full text-gray-500">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col gap-4 max-w-md w-full text-gray-500"
+      >
         <div className="flex flex-col gap-1">
           <p>Course Title</p>
 
@@ -182,7 +239,7 @@ function AddCourse() {
                     width={14}
                     alt=""
                     className={`mr-2 cursor-pointer transition-all ${chapter.collapsed && "-rotate-90"}`}
-                    onClick={() => handleChapter('toggle' , chapter.chapterId)}
+                    onClick={() => handleChapter("toggle", chapter.chapterId)}
                   />
                   <span className="font-semibold">
                     {chapterIndex + 1} {chapter.chapterTitle}
@@ -195,7 +252,7 @@ function AddCourse() {
                   src={assets.cross_icon}
                   className="cursor-pointer"
                   alt="cross_icon"
-                  onClick={() => handleChapter('remove', chapter.chapterId)}
+                  onClick={() => handleChapter("remove", chapter.chapterId)}
                 />
               </div>
               {!chapter.collapsed && (
@@ -217,11 +274,20 @@ function AddCourse() {
                         src={assets.cross_icon}
                         alt="cross_icon"
                         className="cursor-pointer"
-                        onClick={() => handleLecture('remove' , chapter.chapterId , lectureIndex)}
+                        onClick={() =>
+                          handleLecture(
+                            "remove",
+                            chapter.chapterId,
+                            lectureIndex,
+                          )
+                        }
                       />
                     </div>
                   ))}
-                  <div onClick={() => handleLecture('add' , chapter.chapterId)} className="inline-flex bg-gray-100 p-2 rounded cursor-pointer mt-2">
+                  <div
+                    onClick={() => handleLecture("add", chapter.chapterId)}
+                    className="inline-flex bg-gray-100 p-2 rounded cursor-pointer mt-2"
+                  >
                     + Add Lecture
                   </div>
                 </div>

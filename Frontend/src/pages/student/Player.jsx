@@ -49,7 +49,7 @@ const Player = () => {
     }
   }, [enrolledCourses]);
 
-  const markLectureAslCompleted = async (lectureId) => {
+  const markLectureAsCompleted = async (lectureId) => {
     try {
       const token = await getToken();
 

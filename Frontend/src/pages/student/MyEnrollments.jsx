@@ -21,7 +21,7 @@ const MyEnrollments = () => {
   const getCourseprogress = async () => {
     try {
       
-      const token = getToken();
+      const token = await getToken();
 
       const tempProgressArray = await Promise.all(
         enrolledCourses.map(async (course) => {
