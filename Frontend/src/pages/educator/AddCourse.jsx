@@ -64,9 +64,14 @@ function AddCourse() {
       setChapters(
         chapters.map((chapter) => {
           if (chapter.chapterId === chapterId) {
-            chapter.chapterContent.splice(lectureIndex, 1);
+            return {
+              ...chapter,
+              chapterContent: chapter.chapterContent.filter(
+                (_, index) => index !== lectureIndex,
+              ),
+            };
           }
-          return chapters;
+          return chapter;
         }),
       );
     }
@@ -84,7 +89,10 @@ function AddCourse() {
                 : 1,
             lectureId: uniquid(),
           };
-          chapter.chapterContent.push(newLecture);
+          return {
+            ...chapter,
+            chapterContent: [...chapter.chapterContent , newLecture],
+          };
         }
         return chapter;
       }),
@@ -128,12 +136,12 @@ function AddCourse() {
 
       if (data.success) {
         toast.success(data.message);
-        setCourseTitle('');
+        setCourseTitle("");
         setCoursePrice(0);
         setDiscount(0);
         setImage(null);
         setChapters([]);
-        quillRef.current.root.innerHTML = ""
+        quillRef.current.root.innerHTML = "";
       } else {
         toast.error(data.message);
       }
