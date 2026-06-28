@@ -1,12 +1,35 @@
-import { createContext, useEffect, useState } from "react";
-import { dummyCourses } from "../assets/assets";
+import type { Course , User } from "../types";
+
+type AppContextValue = {
+  currency: string;
+  allCourses: Course[];
+  isEducator: boolean;
+  enrolledCourses: Course[];
+  userData: User | null;
+  backendUrl: string;
+  calculateRating: (course: Course) => number;
+  calculateChapterTime: (course: Course) => string;
+  calculateCourseDuration: (course: Course) => string;
+  calculateNoOfLectures: (course: Course) => number;
+  fetchUserEnrolledCourses: () => Promise<void>;
+  fetchAllCourses: () => Promise<void>;
+  getToken: () => Promise<string | null>;
+};
+
+import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import humanizeDuration from "humanize-duration";
 import { useAuth, useUser } from "@clerk/react";
 import axios from "axios";
 import { toast } from "react-toastify";
 
-export const AppContext = createContext();
+export const AppContext = createContext<AppContextValue | null>(null);
+
+export const useAppContext = () => {
+  const context = useContext(AppContext);
+  if(!context) throw new Error("useAppContext must be used inside AppProvider");
+  return context;
+}
 
 export const AppProvider = ({ children }) => {
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
@@ -143,6 +166,5 @@ export const AppProvider = ({ children }) => {
     getToken,
     fetchAllCourses,
   };
-
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };
