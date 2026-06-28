@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useAppContext } from "../../context/AppContext";
+import { useCallback, useEffect, useState } from "react";
+import { useAppContext } from "../../context/useAppContext";
 import { assets } from "../../assets/assets";
 import Loading from "../../components/student/Loading";
 import { toast } from "react-toastify";
@@ -11,7 +11,7 @@ const Dashboard = () => {
 
   const { currency, backendUrl, getToken, isEducator } = useAppContext();
 
-  const fetchDashboardData = async () => {
+  const fetchDashboardData = useCallback(async () => {
     try {
       const token = await getToken();
 
@@ -30,13 +30,13 @@ const Dashboard = () => {
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong");
     }
-  };
+  }, [backendUrl, getToken]);
 
   useEffect(() => {
     if (isEducator) {
       fetchDashboardData();
     }
-  }, [isEducator]);
+  }, [fetchDashboardData, isEducator]);
 
   return dashboardData ? (
     <div className="min-h-screen flex flex-col items-start justify-between gap-8 md:p-8 md:pb-0 p-4 pt-8 pb-0">

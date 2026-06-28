@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { useAppContext } from '../../context/AppContext'
+import { useCallback, useEffect, useState } from 'react'
+import { useAppContext } from '../../context/useAppContext'
 import Loading from '../../components/student/Loading';
 import { toast } from 'react-toastify';
 import axios from 'axios';
@@ -9,7 +9,7 @@ const MyCourses = () => {
   const { currency , backendUrl , isEducator , getToken } = useAppContext();
   const [ courses , setCourses] = useState<Course[] | null>(null);
 
-  const fetchEducatorCourses = async() => {
+  const fetchEducatorCourses = useCallback(async() => {
     try {
 
       const token = await getToken();
@@ -18,18 +18,20 @@ const MyCourses = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
 
-      data.success && setCourses(data.courses);
+      if (data.success) {
+        setCourses(data.courses);
+      }
       
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong")
     }
-  }
+  }, [backendUrl, getToken])
 
   useEffect(() => {
     if(isEducator){
       fetchEducatorCourses();
     }
-  } , [isEducator])
+  } , [fetchEducatorCourses, isEducator])
   return courses ? (
     <div className="h-screen flex flex-col items-start justify-between md:p-8 md:pb-0 p-4 pt-8 pb-0">
       <div className="w-full">

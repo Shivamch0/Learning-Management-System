@@ -1,5 +1,5 @@
 import { NavLink } from "react-router-dom";
-import { useAppContext } from "../../context/AppContext";
+import { useAppContext } from "../../context/useAppContext";
 import { assets } from "../../assets/assets";
 
 const Sidebar = () => {

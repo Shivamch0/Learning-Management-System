@@ -1,46 +1,11 @@
-import {
-  createContext,
-  type Dispatch,
-  type ReactNode,
-  type SetStateAction,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
-import type { NavigateFunction } from "react-router-dom";
+import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Chapter, Course, User } from "../types";
 import humanizeDuration from "humanize-duration";
 import { useAuth, useUser } from "@clerk/react";
 import axios from "axios";
 import { toast } from "react-toastify";
-
-type AppContextValue = {
-  currency: string;
-  allCourses: Course[];
-  navigate: NavigateFunction;
-  isEducator: boolean;
-  setIsEducator: Dispatch<SetStateAction<boolean>>;
-  enrolledCourses: Course[];
-  userData: User | null;
-  setUserData: Dispatch<SetStateAction<User | null>>;
-  backendUrl: string;
-  calculateRating: (course: Course) => number;
-  calculateChapterTime: (chapter: Chapter) => string;
-  calculateCourseDuration: (course: Course) => string;
-  calculateNoOfLectures: (course: Course) => number;
-  fetchUserEnrolledCourses: () => Promise<void>;
-  fetchAllCourses: () => Promise<void>;
-  getToken: () => Promise<string | null>;
-};
-
-export const AppContext = createContext<AppContextValue | null>(null);
-
-export const useAppContext = () => {
-  const context = useContext(AppContext);
-  if(!context) throw new Error("useAppContext must be used inside AppProvider");
-  return context;
-}
+import { AppContext, type AppContextValue } from "./app-context";
 
 type AppProviderProps = {
   children: ReactNode;
@@ -62,7 +27,7 @@ export const AppProvider = ({ children }: AppProviderProps) => {
   const [enrolledCourses, setEnrolledCourses] = useState<Course[]>([]);
   const [userData, setUserData] = useState<User | null>(null);
 
-  const fetchAllCourses = async () => {
+  const fetchAllCourses = useCallback(async () => {
     try {
       const { data } = await axios.get(backendUrl + "/api/course/all");
 
@@ -74,10 +39,10 @@ export const AppProvider = ({ children }: AppProviderProps) => {
     } catch (error) {
       toast.error(getErrorMessage(error));
     }
-  };
+  }, [backendUrl]);
 
-  const fetchUserData = async () => {
-    if (user.publicMetadata.role === "educator") {
+  const fetchUserData = useCallback(async () => {
+    if (user?.publicMetadata.role === "educator") {
       setIsEducator(true);
     }
 
@@ -96,9 +61,9 @@ export const AppProvider = ({ children }: AppProviderProps) => {
     } catch (error) {
       toast.error(getErrorMessage(error));
     }
-  };
+  }, [backendUrl, getToken, user]);
 
-  const calculateRating = (course: Course) => {
+  const calculateRating = useCallback((course: Course) => {
     if (course.courseRatings.length === 0) return 0;
 
     let totalRating = 0;
@@ -106,16 +71,16 @@ export const AppProvider = ({ children }: AppProviderProps) => {
       totalRating += rating.rating;
     });
 
-    return Math.floor(totalRating / course.courseRatings.length)
-  };
+    return Math.floor(totalRating / course.courseRatings.length);
+  }, []);
 
-  const calculateChapterTime = (chapter: Chapter) => {
+  const calculateChapterTime = useCallback((chapter: Chapter) => {
     let time = 0;
     chapter.chapterContent.forEach((lecture) => (time += lecture.lectureDuration));
     return humanizeDuration(time * 60 * 1000, { units: ["h", "m"] });
-  };
+  }, []);
 
-  const calculateCourseDuration = (course: Course) => {
+  const calculateCourseDuration = useCallback((course: Course) => {
     let time = 0;
 
     course.courseContent.forEach((chapter) =>
@@ -124,9 +89,9 @@ export const AppProvider = ({ children }: AppProviderProps) => {
       ),
     );
     return humanizeDuration(time * 60 * 1000, { units: ["h", "m"] });
-  };
+  }, []);
 
-  const calculateNoOfLectures = (course: Course) => {
+  const calculateNoOfLectures = useCallback((course: Course) => {
     let totalLecture = 0;
     course.courseContent.forEach((chapter) => {
       if (Array.isArray(chapter.chapterContent)) {
@@ -134,9 +99,9 @@ export const AppProvider = ({ children }: AppProviderProps) => {
       }
     });
     return totalLecture;
-  };
+  }, []);
 
-  const fetchUserEnrolledCourses = async () => {
+  const fetchUserEnrolledCourses = useCallback(async () => {
     try {
       const token = await getToken();
       const { data } = await axios.get(
@@ -153,20 +118,20 @@ export const AppProvider = ({ children }: AppProviderProps) => {
     } catch (error) {
       toast.error(getErrorMessage(error));
     }
-  };
+  }, [backendUrl, getToken]);
 
   useEffect(() => {
     fetchAllCourses();
-  }, []);
+  }, [fetchAllCourses]);
 
   useEffect(() => {
     if (user) {
       fetchUserData();
       fetchUserEnrolledCourses();
     }
-  }, [user]);
+  }, [fetchUserData, fetchUserEnrolledCourses, user]);
 
-  const value = {
+  const value: AppContextValue = {
     currency,
     allCourses,
     navigate,

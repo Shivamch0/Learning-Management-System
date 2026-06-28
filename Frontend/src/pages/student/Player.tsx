@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from "react";
-import { useAppContext } from "../../context/AppContext";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useAppContext } from "../../context/useAppContext";
 import { useParams } from "react-router-dom";
 import { assets } from "../../assets/assets";
 import humanizeDuration from "humanize-duration";
@@ -46,6 +46,27 @@ const Player = () => {
     setOpenSection((prev) => ({ ...prev, [index]: !prev[index] }));
   };
 
+  const getCourseProgress = useCallback(async () => {
+    try {
+      const token = await getToken();
+
+      const { data } = await axios.post(
+        backendUrl + "/api/user/get-course-progress",
+        { courseId },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
+      if (data.success) {
+        setProgressData(data.progressData);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Something went wrong");
+    }
+  }, [backendUrl, courseId, getToken]);
+
   const markLectureAsCompleted = async (lectureId: string) => {
     try {
       const token = await getToken();
@@ -61,27 +82,6 @@ const Player = () => {
       if (data.success) {
         toast.success(data.message);
         getCourseProgress();
-      } else {
-        toast.error(data.message);
-      }
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Something went wrong");
-    }
-  };
-
-  const getCourseProgress = async () => {
-    try {
-      const token = await getToken();
-
-      const { data } = await axios.post(
-        backendUrl + "/api/user/get-course-progress",
-        { courseId },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      if (data.success) {
-        setProgressData(data.progressData);
       } else {
         toast.error(data.message);
       }
@@ -114,7 +114,7 @@ const Player = () => {
 
   useEffect(() => {
     getCourseProgress();
-  }, []);
+  }, [getCourseProgress]);
 
   return courseData ? (
     <>

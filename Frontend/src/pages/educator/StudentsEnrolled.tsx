@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Loading from "../../components/student/Loading";
-import { useAppContext } from "../../context/AppContext";
+import { useAppContext } from "../../context/useAppContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 import type { EnrolledStudent } from "../../types";
@@ -8,7 +8,7 @@ import type { EnrolledStudent } from "../../types";
 const StudentsEnrolled = () => {
   const { backendUrl, getToken, isEducator } = useAppContext();
   const [enrolledStudents, setEnrolledStudents] = useState<EnrolledStudent[] | null>(null);
-  const fetchEnrolledStudents = async () => {
+  const fetchEnrolledStudents = useCallback(async () => {
     try {
       const token = await getToken();
 
@@ -27,12 +27,12 @@ const StudentsEnrolled = () => {
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong");
     }
-  };
+  }, [backendUrl, getToken]);
   useEffect(() => {
     if (isEducator) {
       fetchEnrolledStudents();
     }
-  }, [isEducator]);
+  }, [fetchEnrolledStudents, isEducator]);
   return enrolledStudents ? (
     <div className="min-h-screen flex flex-col items-start justify-between md:p-8 md:pb-0 p-4 pt-8 pb-0">
       <div className="flex flex-col items-center max-w-4xl w-full overflow-hidden rounded-md bg-white border border-gray-500/20">

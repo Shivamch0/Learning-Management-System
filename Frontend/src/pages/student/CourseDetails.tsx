@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import { useAppContext } from "../../context/AppContext";
+import { useAppContext } from "../../context/useAppContext";
 import { assets } from "../../assets/assets";
 import Loading from "../../components/student/Loading";
 import humanizeDuration from "humanize-duration";
@@ -36,7 +36,7 @@ const CourseDetails = () => {
     [userData, courseData],
   );
 
-  const fetchCourseData = async () => {
+  const fetchCourseData = useCallback(async () => {
     try {
       const { data } = await axios.get(backendUrl + "/api/course/" + id);
 
@@ -48,7 +48,7 @@ const CourseDetails = () => {
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong");
     }
-  };
+  }, [backendUrl, id]);
 
   const enrolledCourse = async () => {
     try {
@@ -84,7 +84,7 @@ const CourseDetails = () => {
 
   useEffect(() => {
     fetchCourseData();
-  }, []);
+  }, [fetchCourseData]);
 
   const toggleSection = (index: number) => {
     setOpenSection((prev) => ({ ...prev, [index]: !prev[index] }));

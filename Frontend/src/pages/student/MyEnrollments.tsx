@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { useAppContext } from "../../context/AppContext";
+import { useCallback, useEffect, useState } from "react";
+import { useAppContext } from "../../context/useAppContext";
 import { Line } from 'rc-progress'
 import Footer from "../../components/student/Footer";
 import axios from "axios";
@@ -19,7 +19,7 @@ const MyEnrollments = () => {
   } = useAppContext();
   const [progressArray, setProgressArray] = useState<ProgressSummary[]>([]);
 
-  const getCourseprogress = async () => {
+  const getCourseprogress = useCallback(async () => {
     try {
       
       const token = await getToken();
@@ -46,19 +46,19 @@ const MyEnrollments = () => {
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Something went wrong")
     }
-  }
+  }, [backendUrl, calculateNoOfLectures, enrolledCourses, getToken])
 
   useEffect(() => {
     if(userData){
       fetchUserEnrolledCourses()
     }
-  } , [userData])
+  } , [fetchUserEnrolledCourses, userData])
 
   useEffect(() => {
     if (enrolledCourses.length > 0) {
       getCourseprogress()
     }
-  }, [enrolledCourses])
+  }, [enrolledCourses, getCourseprogress])
 
   return (
     <>

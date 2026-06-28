@@ -1,14 +1,14 @@
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import uniquid from "uniquid";
 import Quill from "quill";
 import { assets } from "../../assets/assets";
 import { Link } from "react-router-dom";
-import { AppContext } from "../../context/AppContext";
+import { useAppContext } from "../../context/useAppContext";
 import { toast } from "react-toastify";
 import axios from "axios";
 
 function AddCourse() {
-  const { backendUrl, getToken } = useContext(AppContext);
+  const { backendUrl, getToken } = useAppContext();
 
   const quillRef = useRef(null);
   const editorRef = useRef(null);

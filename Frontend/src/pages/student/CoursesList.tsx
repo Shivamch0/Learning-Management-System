@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAppContext } from "../../context/AppContext";
+import { useAppContext } from "../../context/useAppContext";
 import { assets } from "../../assets/assets";
 import { useParams } from "react-router-dom";
 
@@ -19,9 +19,15 @@ const CoursesList = () => {
     if(allCourses && allCourses.length > 0){
       const tempCourses = allCourses.slice()
 
-      input ? 
-        setFilteredCourse(tempCourses.filter(item => item.courseTitle.toLowerCase().includes(input.toLowerCase())))
-      : setFilteredCourse(tempCourses)
+      if (input) {
+        setFilteredCourse(
+          tempCourses.filter((item) =>
+            item.courseTitle.toLowerCase().includes(input.toLowerCase()),
+          ),
+        );
+      } else {
+        setFilteredCourse(tempCourses);
+      }
     }
   } , [allCourses , input])
 
