@@ -1,13 +1,33 @@
 import express from 'express';
+import dotenv from 'dotenv';
 import { clerkWebHooks, stripeWebhooks } from './controller/webhooks.js';
 import { clerkMiddleware } from '@clerk/express';
 import connectCloudinary from './config/cloudinary.js';
 import cors from 'cors'
 
+dotenv.config();
+
 const app = express();
 
 await connectCloudinary()
-app.use(cors());
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://lmsfrontend-sandy.vercel.app',
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`Origin ${origin} is not allowed by CORS`));
+      }
+    },
+    credentials: true,
+  }),
+);
 app.use(clerkMiddleware())
 
 app.post('/stripe' , express.raw({type : 'application/json'}) , stripeWebhooks)

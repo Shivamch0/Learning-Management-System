@@ -5,12 +5,14 @@ import { connectDB } from './config/database.js';
 
 const port = process.env.PORT || 5000;
 
-connectDB()
-.then(() => {
-    app.listen(port , () => {
-        console.log("Server is listening on port on: " , port);
-    })
-})
-.catch((error) => {
-    console.log("Something went wrong..." , error)
-})
+connectDB().catch((error) => {
+  console.log('Something went wrong...', error);
+});
+
+if (!process.env.VERCEL) {
+  app.listen(port, () => {
+    console.log('Server is listening on port on: ', port);
+  });
+}
+
+export default app;
