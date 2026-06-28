@@ -1,6 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 
-const Rating = ({initialRating , onRate}) => {
+type RatingProps = {
+  initialRating?: number;
+  onRate?: (rating:number) => void | Promise<void>;
+}
+
+const Rating = ({initialRating = 0 , onRate} : RatingProps) => {
   const [rating , setRating] = useState(initialRating || 0);
 
   const handleRating = (value) => {
