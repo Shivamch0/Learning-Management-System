@@ -91,8 +91,7 @@ const MyEnrollments = () => {
                 </td>
                 <td className="px-4 py-3 max-sm:hidden">
                   {
-                    progressArray
-                      [index] &&
+                    progressArray[index] &&
                         `${progressArray[index].lectureCompleted} / ${progressArray[index].totalLectures}`
                     
                   }{" "}

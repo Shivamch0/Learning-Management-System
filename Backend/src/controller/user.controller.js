@@ -46,7 +46,7 @@ export const purchaseCourse = async (req, res) => {
     const purchaseData = {
       courseId: courseData._id,
       userId,
-      amount: (courseData.coursePrice =
+      amount: (courseData.coursePrice -
         (courseData.discount * courseData.coursePrice) / 100).toFixed(2),
     };
 
@@ -63,7 +63,7 @@ export const purchaseCourse = async (req, res) => {
           product_data: {
             name: courseData.courseTitle,
           },
-          unit_amount: Math.floor(newPurchase.amount) * 100,
+          unit_amount: Math.round(Number(newPurchase.amount) * 100),
         },
         quantity: 1,
       },
@@ -97,6 +97,9 @@ export const updateUserCourseProgress = async (req, res) => {
           success: true,
           message: "Lecture Already Completed",
         });
+      }else{
+        progressData.lectureCompleted.push(lectureId);
+        await progressData.save();
       }
     } else {
       await CourseProgress.create({

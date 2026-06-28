@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import uniquid from "uniquid";
 import Quill from "quill";
 import { assets } from "../../assets/assets";
@@ -102,7 +102,7 @@ function AddCourse() {
     try {
       e.preventDefault();
       if (!image) {
-        toast.error("Thumbnail Not Selected");
+        return toast.error("Thumbnail Not Selected");
       }
 
       const courseData = {
