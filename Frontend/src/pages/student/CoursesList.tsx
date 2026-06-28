@@ -1,18 +1,19 @@
-import { useContext, useEffect, useState } from "react";
-import { AppContext } from "../../context/AppContext";
+import { useEffect, useState } from "react";
+import { useAppContext } from "../../context/AppContext";
 import { assets } from "../../assets/assets";
 import { useParams } from "react-router-dom";
 
 import SeachBar from "../../components/student/SearchBar";
 import CourseCard from '../../components/student/CourseCard';
 import Footer from '../../components/student/Footer'
+import type { Course } from "../../types";
 
 
 
 const CoursesList = () => {
-  const { navigate , allCourses } = useContext(AppContext)
+  const { navigate , allCourses } = useAppContext()
   const {input} = useParams();
-  const [filteredCourse , setFilteredCourse] = useState([]);
+  const [filteredCourse , setFilteredCourse] = useState<Course[]>([]);
 
   useEffect(()=> {
     if(allCourses && allCourses.length > 0){

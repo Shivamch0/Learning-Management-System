@@ -1,12 +1,13 @@
-import { useContext, useEffect, useState } from 'react'
-import { AppContext } from '../../context/AppContext'
+import { useEffect, useState } from 'react'
+import { useAppContext } from '../../context/AppContext'
 import Loading from '../../components/student/Loading';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import type { Course } from '../../types';
 
 const MyCourses = () => {
-  const { currency , backendUrl , isEducator , getToken } = useContext(AppContext);
-  const [ courses , setCourses] = useState(null);
+  const { currency , backendUrl , isEducator , getToken } = useAppContext();
+  const [ courses , setCourses] = useState<Course[] | null>(null);
 
   const fetchEducatorCourses = async() => {
     try {
@@ -20,7 +21,7 @@ const MyCourses = () => {
       data.success && setCourses(data.courses);
       
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error instanceof Error ? error.message : "Something went wrong")
     }
   }
 

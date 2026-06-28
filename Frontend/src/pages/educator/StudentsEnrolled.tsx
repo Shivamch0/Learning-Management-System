@@ -1,13 +1,13 @@
-import React, { useContext, useEffect, useState } from "react";
-import { dummyStudentEnrolled } from "../../assets/assets";
+import { useEffect, useState } from "react";
 import Loading from "../../components/student/Loading";
-import { AppContext } from "../../context/AppContext";
+import { useAppContext } from "../../context/AppContext";
 import axios from "axios";
 import { toast } from "react-toastify";
+import type { EnrolledStudent } from "../../types";
 
 const StudentsEnrolled = () => {
-  const { backendUrl, getToken, isEducator } = useContext(AppContext);
-  const [enrolledStudents, setEnrolledStudents] = useState(null);
+  const { backendUrl, getToken, isEducator } = useAppContext();
+  const [enrolledStudents, setEnrolledStudents] = useState<EnrolledStudent[] | null>(null);
   const fetchEnrolledStudents = async () => {
     try {
       const token = await getToken();
@@ -25,7 +25,7 @@ const StudentsEnrolled = () => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error instanceof Error ? error.message : "Something went wrong");
     }
   };
   useEffect(() => {

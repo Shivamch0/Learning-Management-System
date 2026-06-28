@@ -1,9 +1,10 @@
-import React, { useContext , useEffect, useState } from "react";
-import { AppContext } from "../../context/AppContext";
+import { useEffect, useState } from "react";
+import { useAppContext } from "../../context/AppContext";
 import { Line } from 'rc-progress'
 import Footer from "../../components/student/Footer";
 import axios from "axios";
 import { toast } from "react-toastify";
+import type { ProgressSummary } from "../../types";
 
 const MyEnrollments = () => {
   const {
@@ -15,8 +16,8 @@ const MyEnrollments = () => {
     backendUrl,
     getToken,
     calculateNoOfLectures,
-  } = useContext(AppContext);
-  const [progressArray, setProgressArray] = useState([]);
+  } = useAppContext();
+  const [progressArray, setProgressArray] = useState<ProgressSummary[]>([]);
 
   const getCourseprogress = async () => {
     try {
@@ -32,7 +33,7 @@ const MyEnrollments = () => {
               headers: { Authorization: `Bearer ${token}` },
             },
           );
-          let totalLectures = calculateNoOfLectures(course);
+          const totalLectures = calculateNoOfLectures(course);
           const lectureCompleted = data.progressData
             ? data.progressData.lectureCompleted.length
             : 0;
@@ -43,7 +44,7 @@ const MyEnrollments = () => {
       setProgressArray(tempProgressArray);
 
     } catch (error) {
-      toast.error(error.message)
+      toast.error(error instanceof Error ? error.message : "Something went wrong")
     }
   }
 

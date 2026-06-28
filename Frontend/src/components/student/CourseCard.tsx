@@ -1,10 +1,14 @@
-import React, { useContext } from 'react'
 import { Link } from 'react-router-dom'
 import { assets } from '../../assets/assets'
-import { AppContext } from '../../context/AppContext'
+import { useAppContext } from '../../context/AppContext'
+import type { Course } from '../../types'
 
-const CourseCard = ({course}) => {
-  const { currency , calculateRating } = useContext(AppContext)
+type CourseCardProps = {
+  course: Course;
+};
+
+const CourseCard = ({course}: CourseCardProps) => {
+  const { currency , calculateRating } = useAppContext()
   return (
     <Link to={'/course/' + course._id} onClick={() => scrollTo(0 , 0)}
     className='border border-gray-500/30 pb-6 overflow-hidden rounded-lg'>

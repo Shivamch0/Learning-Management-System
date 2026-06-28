@@ -1,14 +1,15 @@
-import React, { useContext, useEffect, useState } from "react";
-import { AppContext } from "../../context/AppContext";
-import { assets, dummyDashboardData } from "../../assets/assets";
+import { useEffect, useState } from "react";
+import { useAppContext } from "../../context/AppContext";
+import { assets } from "../../assets/assets";
 import Loading from "../../components/student/Loading";
 import { toast } from "react-toastify";
 import axios from "axios";
+import type { DashboardData } from "../../types";
 
 const Dashboard = () => {
-  const [dashboardData, setDashboardData] = useState();
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
 
-  const { currency, backendUrl, getToken, isEducator } = useContext(AppContext);
+  const { currency, backendUrl, getToken, isEducator } = useAppContext();
 
   const fetchDashboardData = async () => {
     try {
@@ -27,7 +28,7 @@ const Dashboard = () => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error instanceof Error ? error.message : "Something went wrong");
     }
   };
 

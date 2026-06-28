@@ -8,15 +8,13 @@ type RatingProps = {
 const Rating = ({initialRating = 0 , onRate} : RatingProps) => {
   const [rating , setRating] = useState(initialRating || 0);
 
-  const handleRating = (value) => {
+  const handleRating = (value: number) => {
     setRating(value);
     if(onRate) onRate(value)
   }
 
   useEffect(() => {
-    if(initialRating){
-      setRating(initialRating)
-    }
+    setRating(initialRating)
   } , [initialRating]);
 
   return (

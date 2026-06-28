@@ -1,8 +1,7 @@
 import { assets } from "../../assets/assets";
 import { Link } from "react-router-dom";
 import { useClerk, UserButton, useUser } from "@clerk/react";
-import { useContext } from "react";
-import { AppContext } from "../../context/AppContext";
+import { useAppContext } from "../../context/AppContext";
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -12,7 +11,7 @@ const Navbar = () => {
   const { openSignIn } = useClerk();
   const { user } = useUser();
   const { navigate, isEducator, backendUrl, setIsEducator, getToken } =
-    useContext(AppContext);
+    useAppContext();
 
   const becomeEducator = async () => {
     try {
@@ -37,7 +36,7 @@ const Navbar = () => {
         toast.error(data.message);
       }
     } catch (error) {
-        toast.error(error.message);
+      toast.error(error instanceof Error ? error.message : "Something went wrong");
     }
   };
 

@@ -1,11 +1,10 @@
-import { useContext } from "react";
 import { NavLink } from "react-router-dom";
-import { AppContext } from "../../context/AppContext";
+import { useAppContext } from "../../context/AppContext";
 import { assets } from "../../assets/assets";
 
 const Sidebar = () => {
 
-  const { isEducator } = useContext(AppContext)
+  const { isEducator } = useAppContext()
 
   const menuItems = [
     {

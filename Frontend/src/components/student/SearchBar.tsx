@@ -1,13 +1,17 @@
-import React, { useState } from 'react'
+import { type FormEvent, useState } from 'react'
 import { assets } from '../../assets/assets'
 import {useNavigate} from 'react-router-dom'
 
-const SearchBar = ({data}) => {
+type SearchBarProps = {
+  data?: string;
+};
+
+const SearchBar = ({data}: SearchBarProps) => {
   const [input , setInput] = useState(data ? data : "")
 
   const navigate = useNavigate()
 
-  const onSearchHandler = (e) => {
+  const onSearchHandler = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     navigate('/course-list/' + input)
   }

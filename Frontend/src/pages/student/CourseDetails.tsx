@@ -1,6 +1,6 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import { AppContext } from "../../context/AppContext";
+import { useAppContext } from "../../context/AppContext";
 import { assets } from "../../assets/assets";
 import Loading from "../../components/student/Loading";
 import humanizeDuration from "humanize-duration";
@@ -8,16 +8,19 @@ import Footer from "../../components/student/Footer";
 import Youtube from "react-youtube";
 import axios from "axios";
 import { toast } from "react-toastify";
+import type { Course } from "../../types";
+
+type PreviewPlayerData = {
+  videoId?: string;
+};
 
 const CourseDetails = () => {
   const { id } = useParams();
-  const [courseData, setCourseData] = useState(null);
-  const [openSection, setOpenSection] = useState({});
-  const [isAlreadYEnrolled, setIsAlreadyEnrolled] = useState(false);
-  const [playerData, setPlayerData] = useState(null);
+  const [courseData, setCourseData] = useState<Course | null>(null);
+  const [openSection, setOpenSection] = useState<Record<number, boolean>>({});
+  const [playerData, setPlayerData] = useState<PreviewPlayerData | null>(null);
 
   const {
-    allCourses,
     calculateRating,
     calculateChapterTime,
     calculateCourseDuration,
@@ -26,7 +29,12 @@ const CourseDetails = () => {
     backendUrl,
     userData,
     getToken
-  } = useContext(AppContext);
+  } = useAppContext();
+
+  const isAlreadyEnrolled = useMemo(
+    () => Boolean(userData && courseData && userData.enrolledCourses.includes(courseData._id)),
+    [userData, courseData],
+  );
 
   const fetchCourseData = async () => {
     try {
@@ -38,7 +46,7 @@ const CourseDetails = () => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error instanceof Error ? error.message : "Something went wrong");
     }
   };
 
@@ -48,7 +56,7 @@ const CourseDetails = () => {
       if(!userData){
         return toast.warn('Login to Enroll')
       }
-      if(isAlreadYEnrolled){
+      if(isAlreadyEnrolled){
         return toast.warn("Already Enrolled");
       }
 
@@ -56,7 +64,7 @@ const CourseDetails = () => {
 
       const { data } = await axios.post(
         backendUrl + "/api/user/purchase",
-        { courseId: courseData._id },
+        { courseId: courseData?._id },
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -70,7 +78,7 @@ const CourseDetails = () => {
       }
 
     } catch (error) {
-        toast.error(error.message);
+        toast.error(error instanceof Error ? error.message : "Something went wrong");
     }
   };
 
@@ -78,13 +86,7 @@ const CourseDetails = () => {
     fetchCourseData();
   }, []);
 
-  useEffect(() => {
-    if(userData && courseData){
-      setIsAlreadyEnrolled(userData.enrolledCourses.includes(courseData._id))
-    }
-  }, [userData , courseData]);
-
-  const toggleSection = (index) => {
+  const toggleSection = (index: number) => {
     setOpenSection((prev) => ({ ...prev, [index]: !prev[index] }));
   };
 
@@ -276,7 +278,7 @@ const CourseDetails = () => {
             </div>
 
             <button onClick={enrolledCourse} className="md:mt-6 mt-4 w-full py-3 rounded bg-blue-600 text-white font-medium">
-              {isAlreadYEnrolled ? "Already Enrolled" : "Enroll Now"}
+              {isAlreadyEnrolled ? "Already Enrolled" : "Enroll Now"}
             </button>
 
             <div className="pt-6">

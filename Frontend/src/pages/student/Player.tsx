@@ -1,5 +1,5 @@
-import { useContext, useEffect, useState } from "react";
-import { AppContext } from "../../context/AppContext";
+import { useEffect, useMemo, useState } from "react";
+import { useAppContext } from "../../context/AppContext";
 import { useParams } from "react-router-dom";
 import { assets } from "../../assets/assets";
 import humanizeDuration from "humanize-duration";
@@ -9,6 +9,12 @@ import Rating from "../../components/student/Rating";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Loading from "../../components/student/Loading";
+import type { CourseProgress, Lecture } from "../../types";
+
+type PlayerLecture = Lecture & {
+  chapter: number;
+  lecture: number;
+};
 
 const Player = () => {
   const {
@@ -18,38 +24,29 @@ const Player = () => {
     getToken,
     userData,
     fetchUserEnrolledCourses,
-  } = useContext(AppContext);
+  } = useAppContext();
   const { courseId } = useParams();
-  const [courseData, setCourseData] = useState(null);
-  const [openSection, setOpenSection] = useState({});
-  const [playerData, setPlayerData] = useState(null);
-  const [progressData, setProgressData] = useState(null);
-  const [initialRating, setInitialRating] = useState(0);
+  const [openSection, setOpenSection] = useState<Record<number, boolean>>({});
+  const [playerData, setPlayerData] = useState<PlayerLecture | null>(null);
+  const [progressData, setProgressData] = useState<CourseProgress | null>(null);
 
-  const getCourseData = () => {
-    enrolledCourses.map((course) => {
-      if (course._id === courseId) {
-        setCourseData(course);
-        course.courseRatings.map((item) => {
-          if (item.userId === userData._id) {
-            setInitialRating(item.rating);
-          }
-        });
-      }
-    });
-  };
+  const courseData = useMemo(
+    () => enrolledCourses.find((course) => course._id === courseId) || null,
+    [enrolledCourses, courseId],
+  );
 
-  const toggleSection = (index) => {
+  const initialRating = useMemo(
+    () =>
+      courseData?.courseRatings.find((item) => item.userId === userData?._id)
+        ?.rating || 0,
+    [courseData, userData],
+  );
+
+  const toggleSection = (index: number) => {
     setOpenSection((prev) => ({ ...prev, [index]: !prev[index] }));
   };
 
-  useEffect(() => {
-    if (enrolledCourses.length > 0) {
-      getCourseData();
-    }
-  }, [enrolledCourses]);
-
-  const markLectureAsCompleted = async (lectureId) => {
+  const markLectureAsCompleted = async (lectureId: string) => {
     try {
       const token = await getToken();
 
@@ -68,7 +65,7 @@ const Player = () => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error instanceof Error ? error.message : "Something went wrong");
     }
   };
 
@@ -89,11 +86,11 @@ const Player = () => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error instanceof Error ? error.message : "Something went wrong");
     }
   };
 
-  const handleRate = async (rating) => {
+  const handleRate = async (rating: number) => {
     try {
       const token = await getToken();
 
@@ -111,7 +108,7 @@ const Player = () => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error instanceof Error ? error.message : "Something went wrong");
     }
   };
 
@@ -231,11 +228,7 @@ const Player = () => {
             </div>
           ) : (
             <img
-              src={
-                courseData
-                  ? courseData.courseThumbnail
-                  : courseData.courseThumbnail
-              }
+              src={courseData.courseThumbnail}
               alt=""
             />
           )}

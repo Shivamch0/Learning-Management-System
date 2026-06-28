@@ -1,10 +1,9 @@
-import React, { useContext } from 'react'
 import { Link } from 'react-router-dom'
 import CourseCard from './CourseCard'
-import { AppContext } from '../../context/AppContext'
+import { useAppContext } from '../../context/AppContext'
 
 const CoursesSection = () => {
-  const { allCourses } = useContext(AppContext)
+  const { allCourses } = useAppContext()
    return (
     <div className='py-16 md:px-40 px-8'>
       <h2 className='text-3xl font-medium text-gray-800'>Learn from the best</h2>

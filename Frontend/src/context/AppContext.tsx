@@ -1,27 +1,38 @@
-import type { Course , User } from "../types";
+import {
+  createContext,
+  type Dispatch,
+  type ReactNode,
+  type SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import type { NavigateFunction } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import type { Chapter, Course, User } from "../types";
+import humanizeDuration from "humanize-duration";
+import { useAuth, useUser } from "@clerk/react";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 type AppContextValue = {
   currency: string;
   allCourses: Course[];
+  navigate: NavigateFunction;
   isEducator: boolean;
+  setIsEducator: Dispatch<SetStateAction<boolean>>;
   enrolledCourses: Course[];
   userData: User | null;
+  setUserData: Dispatch<SetStateAction<User | null>>;
   backendUrl: string;
   calculateRating: (course: Course) => number;
-  calculateChapterTime: (course: Course) => string;
+  calculateChapterTime: (chapter: Chapter) => string;
   calculateCourseDuration: (course: Course) => string;
   calculateNoOfLectures: (course: Course) => number;
   fetchUserEnrolledCourses: () => Promise<void>;
   fetchAllCourses: () => Promise<void>;
   getToken: () => Promise<string | null>;
 };
-
-import { createContext, useContext, useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import humanizeDuration from "humanize-duration";
-import { useAuth, useUser } from "@clerk/react";
-import axios from "axios";
-import { toast } from "react-toastify";
 
 export const AppContext = createContext<AppContextValue | null>(null);
 
@@ -31,18 +42,25 @@ export const useAppContext = () => {
   return context;
 }
 
-export const AppProvider = ({ children }) => {
-  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+type AppProviderProps = {
+  children: ReactNode;
+};
 
-  const currency = import.meta.env.VITE_CURRENCY;
+const getErrorMessage = (error: unknown) =>
+  error instanceof Error ? error.message : "Something went wrong";
+
+export const AppProvider = ({ children }: AppProviderProps) => {
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "";
+
+  const currency = import.meta.env.VITE_CURRENCY || "$";
   const navigate = useNavigate();
   const { getToken } = useAuth();
   const { user } = useUser();
 
-  const [allCourses, setAllCourses] = useState([]);
+  const [allCourses, setAllCourses] = useState<Course[]>([]);
   const [isEducator, setIsEducator] = useState(false);
-  const [enrolledCourses, setEnrolledCourses] = useState([]);
-  const [userData, setUserData] = useState(null);
+  const [enrolledCourses, setEnrolledCourses] = useState<Course[]>([]);
+  const [userData, setUserData] = useState<User | null>(null);
 
   const fetchAllCourses = async () => {
     try {
@@ -54,7 +72,7 @@ export const AppProvider = ({ children }) => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(getErrorMessage(error));
     }
   };
 
@@ -76,11 +94,11 @@ export const AppProvider = ({ children }) => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(getErrorMessage(error));
     }
   };
 
-  const calculateRating = (course) => {
+  const calculateRating = (course: Course) => {
     if (course.courseRatings.length === 0) return 0;
 
     let totalRating = 0;
@@ -91,24 +109,24 @@ export const AppProvider = ({ children }) => {
     return Math.floor(totalRating / course.courseRatings.length)
   };
 
-  const calculateChapterTime = (chapter) => {
+  const calculateChapterTime = (chapter: Chapter) => {
     let time = 0;
-    chapter.chapterContent.map((lecture) => (time += lecture.lectureDuration));
+    chapter.chapterContent.forEach((lecture) => (time += lecture.lectureDuration));
     return humanizeDuration(time * 60 * 1000, { units: ["h", "m"] });
   };
 
-  const calculateCourseDuration = (course) => {
+  const calculateCourseDuration = (course: Course) => {
     let time = 0;
 
-    course.courseContent.map((chapter) =>
-      chapter.chapterContent.map(
+    course.courseContent.forEach((chapter) =>
+      chapter.chapterContent.forEach(
         (lecture) => (time += lecture.lectureDuration),
       ),
     );
     return humanizeDuration(time * 60 * 1000, { units: ["h", "m"] });
   };
 
-  const calculateNoOfLectures = (course) => {
+  const calculateNoOfLectures = (course: Course) => {
     let totalLecture = 0;
     course.courseContent.forEach((chapter) => {
       if (Array.isArray(chapter.chapterContent)) {
@@ -133,7 +151,7 @@ export const AppProvider = ({ children }) => {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.message);
+      toast.error(getErrorMessage(error));
     }
   };
 
