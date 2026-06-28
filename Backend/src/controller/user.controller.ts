@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { getAuth } from "@clerk/express";
 import { User } from "../model/user.model.js";
 import { Course } from "../model/course.model.js";

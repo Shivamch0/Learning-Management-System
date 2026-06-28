@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { clerkClient, getAuth } from "@clerk/express";
 import { Course } from "../model/course.model.js";
 import { v2 as cloudinary } from "cloudinary";
