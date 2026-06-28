@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import mongoose , {Schema, type InferSchemaType} from "mongoose";
 
-const lectureSchema = new mongoose.Schema({
+const lectureSchema = new Schema({
     lectureId : { type : String , required : true},
     lectureTitle : { type : String , required : true},
     lectureDuration : { type : Number , required : true},
@@ -9,7 +9,7 @@ const lectureSchema = new mongoose.Schema({
     lectureOrder : {type : Number , required: true},
 } , {_id : false})
 
-const chapterSchema = new mongoose.Schema({
+const chapterSchema = new Schema({
     chapterId : { type : String , required : true},
     chapterOrder : { type : Number , required : true},
     chapterTitle : { type : String , required : true},
@@ -17,7 +17,7 @@ const chapterSchema = new mongoose.Schema({
 } , {_id: false}
 )
 
-const courseSchema = new mongoose.Schema({
+const courseSchema = new Schema({
     courseTitle : {type: String , required : true},
     courseDescription : {type: String , required : true},
     courseThumbnail: {type: String },
@@ -33,5 +33,7 @@ const courseSchema = new mongoose.Schema({
         {type : String , ref : 'User'}
     ]
 } , { timestamps : true , minimize : false});
+
+export type CourseType = InferSchemaType<typeof courseSchema>
 
 export const Course = mongoose.model("Course" , courseSchema)

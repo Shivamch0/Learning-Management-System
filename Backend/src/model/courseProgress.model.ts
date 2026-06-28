@@ -1,6 +1,6 @@
-import mongoose from "mongoose";
+import mongoose , {Schema , type InferSchemaType} from "mongoose";
 
-const courseProgressSchema = new mongoose.Schema(
+const courseProgressSchema = new Schema(
   {
     userId: {
       type: String,
@@ -20,6 +20,8 @@ const courseProgressSchema = new mongoose.Schema(
     minimize: false,
   }
 );
+
+export type CourseProgressType = InferSchemaType<typeof courseProgressSchema>
 
 export const CourseProgress = mongoose.model(
   "CourseProgress",
