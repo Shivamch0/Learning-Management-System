@@ -1,11 +1,12 @@
 // @ts-nocheck
+import { Request, Response } from "express";
 import { clerkClient, getAuth } from "@clerk/express";
 import { Course } from "../model/course.model.js";
 import { v2 as cloudinary } from "cloudinary";
 import { Purchase } from "../model/purchase.model.js";
 import { User } from "../model/user.model.js";
 
-export const updateRoleEducator = async (req, res) => {
+export const updateRoleEducator = async (req: Request, res: Response) => {
   try {
     const { userId } = getAuth(req);
 
@@ -24,7 +25,7 @@ export const updateRoleEducator = async (req, res) => {
   }
 };
 
-export const addCourse = async (req , res) => {
+export const addCourse = async (req: Request, res: Response) => {
     try {
         
         const {courseData} = req.body;
@@ -50,7 +51,7 @@ export const addCourse = async (req , res) => {
 }
 
 
-export const getEducatorCourses = async (req , res) => {
+export const getEducatorCourses = async (req :Request , res: Response) => {
     try {
         const {userId} = getAuth(req);
         const courses = await Course.find({educator : userId});
@@ -60,7 +61,7 @@ export const getEducatorCourses = async (req , res) => {
     }
 }
 
-export const educatorDashboardData = async (req , res) => {
+export const educatorDashboardData = async (req :Request , res: Response) => {
     try {
         const {userId} = getAuth(req);
 
@@ -99,7 +100,7 @@ export const educatorDashboardData = async (req , res) => {
     }
 }
 
-export const getEnrolledStudentsData = async (req , res) => {
+export const getEnrolledStudentsData = async (req: Request, res: Response) => {
     try {
         const {userId} = getAuth(req);
         const courses = await Course.find({educator : userId});

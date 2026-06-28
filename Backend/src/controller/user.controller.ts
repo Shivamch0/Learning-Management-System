@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { Request, Response } from "express";
 import { getAuth } from "@clerk/express";
 import { User } from "../model/user.model.js";
 import { Course } from "../model/course.model.js";
@@ -6,7 +7,7 @@ import { Purchase } from "../model/purchase.model.js";
 import Stripe from "stripe";
 import { CourseProgress } from "../model/courseProgress.model.js";
 
-export const getUserData = async (req, res) => {
+export const getUserData = async (req: Request, res: Response) => {
   try {
     const { userId } = getAuth(req);
     const user = await User.findById(userId);
@@ -20,7 +21,7 @@ export const getUserData = async (req, res) => {
   }
 };
 
-export const userEnrolledCourses = async (req, res) => {
+export const userEnrolledCourses = async (req: Request, res: Response) => {
   try {
     const { userId } = getAuth(req);
     const userData = await User.findById(userId).populate("enrolledCourses");
@@ -31,7 +32,7 @@ export const userEnrolledCourses = async (req, res) => {
   }
 };
 
-export const purchaseCourse = async (req, res) => {
+export const purchaseCourse = async (req: Request, res: Response) => {
   try {
     const { courseId } = req.body;
     const { origin } = req.headers;
@@ -86,7 +87,7 @@ export const purchaseCourse = async (req, res) => {
   }
 };
 
-export const updateUserCourseProgress = async (req, res) => {
+export const updateUserCourseProgress = async (req: Request, res: Response) => {
   try {
     const { userId } = getAuth(req);
     const { courseId, lectureId } = req.body;
@@ -116,7 +117,7 @@ export const updateUserCourseProgress = async (req, res) => {
   }
 };
 
-export const getUserCourseProgress = async (req, res) => {
+export const getUserCourseProgress = async (req: Request, res: Response) => {
   try {
     const { userId } = getAuth(req);
     const { courseId, lectureId } = req.body;
@@ -129,7 +130,7 @@ export const getUserCourseProgress = async (req, res) => {
   }
 };
 
-export const addUserRating = async (req, res) => {
+export const addUserRating = async (req: Request, res: Response) => {
   const { userId } = getAuth(req);
   const { courseId, rating } = req.body;
 

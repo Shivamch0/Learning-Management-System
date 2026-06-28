@@ -1,6 +1,7 @@
+import { Request, Response } from "express";
 import { Course } from "../model/course.model.js";
 
-export const getAllCourses = async (req, res) => {
+export const getAllCourses = async (req: Request, res: Response) => {
   try {
     const courses = await Course.find({ isPublished: true })
       .select(["-courseContent", "-enrolledStudents"])
@@ -12,7 +13,7 @@ export const getAllCourses = async (req, res) => {
   }
 };
 
-export const getCourseId = async (req, res) => {
+export const getCourseId = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   try {

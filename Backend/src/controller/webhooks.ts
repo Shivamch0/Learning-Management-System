@@ -1,6 +1,7 @@
 // @ts-nocheck
 import dotenv from 'dotenv';
 dotenv.config();
+import { Request, Response } from "express";
 import { Webhook } from "svix";
 import { User } from "../model/user.model.js";
 import Stripe from "stripe";
@@ -8,7 +9,7 @@ import { Purchase } from "../model/purchase.model.js";
 import { Course } from "../model/course.model.js";
 
 
-export const clerkWebHooks = async (req, res) => {
+export const clerkWebHooks = async (req: Request, res: Response) => {
   try {
     const whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET);
     await whook.verify(JSON.stringify(req.body), {
@@ -59,7 +60,7 @@ export const clerkWebHooks = async (req, res) => {
 
 const stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY);
 
-export const stripeWebhooks = async (request, response) => {
+export const stripeWebhooks = async (request: Request, response: Response) => {
   const sig = request.headers["stripe-signature"];
 
   let event;
